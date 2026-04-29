@@ -20,15 +20,12 @@ const __dirname = dirname(__filename);
 
 const app = express();
 
-// En production, le frontend est servi par Express donc pas besoin de CORS
-// En développement, on autorise localhost:5173
-if (process.env.NODE_ENV !== 'production') {
-  app.use(
-    cors({
-      origin: process.env.FRONTEND_URL || 'http://localhost:5173'
-    })
-  );
-}
+// Autoriser le frontend séparé en production et en développement
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173'
+  })
+);
 
 app.use(express.json());
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
