@@ -4,8 +4,8 @@ const getRevenueForInterval = async (sqlCondition) => {
   const [rows] = await pool.query(
     `
       SELECT COALESCE(SUM(l.quantite * l.prix_unitaire), 0) AS total
-      FROM commande c
-      JOIN ligne_commande l ON l.id_commande = c.id_commande
+      FROM COMMANDE c
+      JOIN LIGNE_COMMANDE l ON l.id_commande = c.id_commande
       WHERE c.statut = 'payee' AND ${sqlCondition}
     `
   );
@@ -16,7 +16,7 @@ const getRevenueForInterval = async (sqlCondition) => {
 export const getDashboardStats = async () => {
   const [statusRows] = await pool.query(`
     SELECT statut, COUNT(*) AS total
-    FROM commande
+    FROM COMMANDE
     GROUP BY statut
   `);
 
@@ -25,8 +25,8 @@ export const getDashboardStats = async () => {
       p.id_plat,
       p.nom,
       SUM(l.quantite) AS quantite_totale
-    FROM ligne_commande l
-    JOIN plat p ON p.id_plat = l.id_plat
+    FROM LIGNE_COMMANDE l
+    JOIN PLAT p ON p.id_plat = l.id_plat
     GROUP BY p.id_plat, p.nom
     ORDER BY quantite_totale DESC
     LIMIT 5
@@ -40,9 +40,9 @@ export const getDashboardStats = async () => {
       c.updated_at,
       t.numero AS table_numero,
       u.nom AS serveur_nom
-    FROM commande c
-    JOIN table_restaurant t ON t.id_table = c.id_table
-    JOIN utilisateur u ON u.id_utilisateur = c.id_serveur
+    FROM COMMANDE c
+    JOIN TABLE_RESTAURANT t ON t.id_table = c.id_table
+    JOIN UTILISATEUR u ON u.id_utilisateur = c.id_serveur
     ORDER BY c.updated_at DESC
     LIMIT 8
   `);

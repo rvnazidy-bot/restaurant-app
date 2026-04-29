@@ -3,9 +3,9 @@ import pool from '../config/db.js';
 
 export const createInvitation = async (userId) => {
   const token = crypto.randomBytes(24).toString('hex');
-  await pool.query('UPDATE invitation SET utilise = 1 WHERE id_utilisateur = ? AND utilise = 0', [userId]);
+  await pool.query('UPDATE INVITATION SET utilise = 1 WHERE id_utilisateur = ? AND utilise = 0', [userId]);
   await pool.query(
-    'INSERT INTO invitation (id_utilisateur, token, expire_le, utilise) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), 0)',
+    'INSERT INTO INVITATION (id_utilisateur, token, expire_le, utilise) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), 0)',
     [userId, token]
   );
   return getInvitationByToken(token);
@@ -20,8 +20,8 @@ export const getInvitationByToken = async (token) => {
         u.email,
         u.role,
         u.statut AS user_statut
-      FROM invitation i
-      JOIN utilisateur u ON u.id_utilisateur = i.id_utilisateur
+      FROM INVITATION i
+      JOIN UTILISATEUR u ON u.id_utilisateur = i.id_utilisateur
       WHERE i.token = ?
       LIMIT 1
     `,
@@ -32,12 +32,12 @@ export const getInvitationByToken = async (token) => {
 };
 
 export const markInvitationUsed = async (token) => {
-  await pool.query('UPDATE invitation SET utilise = 1 WHERE token = ?', [token]);
+  await pool.query('UPDATE INVITATION SET utilise = 1 WHERE token = ?', [token]);
 };
 
 export const getLatestInvitationByUserId = async (userId) => {
   const [rows] = await pool.query(
-    'SELECT * FROM invitation WHERE id_utilisateur = ? ORDER BY created_at DESC LIMIT 1',
+    'SELECT * FROM INVITATION WHERE id_utilisateur = ? ORDER BY created_at DESC LIMIT 1',
     [userId]
   );
   return rows[0] || null;

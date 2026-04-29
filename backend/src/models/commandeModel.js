@@ -52,10 +52,10 @@ export const listCommandes = async ({ role, statut, date, table, scope }) => {
         u.nom AS serveur_nom,
         COUNT(l.id_ligne) AS nombre_lignes,
         COALESCE(SUM(l.quantite * l.prix_unitaire), 0) AS total
-      FROM commande c
-      JOIN table_restaurant t ON t.id_table = c.id_table
-      JOIN utilisateur u ON u.id_utilisateur = c.id_serveur
-      LEFT JOIN ligne_commande l ON l.id_commande = c.id_commande
+      FROM COMMANDE c
+      JOIN TABLE_RESTAURANT t ON t.id_table = c.id_table
+      JOIN UTILISATEUR u ON u.id_utilisateur = c.id_serveur
+      LEFT JOIN LIGNE_COMMANDE l ON l.id_commande = c.id_commande
       ${where}
       GROUP BY c.id_commande
       ${orderBy}
@@ -79,8 +79,8 @@ export const listCommandes = async ({ role, statut, date, table, scope }) => {
           l.notes,
           p.nom AS plat_nom,
           p.image_url
-        FROM ligne_commande l
-        JOIN plat p ON p.id_plat = l.id_plat
+        FROM LIGNE_COMMANDE l
+        JOIN PLAT p ON p.id_plat = l.id_plat
         WHERE l.id_commande IN (${placeholders})
         ORDER BY l.id_commande ASC, l.id_ligne ASC
       `,
@@ -119,10 +119,10 @@ export const getCommandeById = async (id) => {
         t.numero AS table_numero,
         u.nom AS serveur_nom,
         COALESCE(SUM(l.quantite * l.prix_unitaire), 0) AS total
-      FROM commande c
-      JOIN table_restaurant t ON t.id_table = c.id_table
-      JOIN utilisateur u ON u.id_utilisateur = c.id_serveur
-      LEFT JOIN ligne_commande l ON l.id_commande = c.id_commande
+      FROM COMMANDE c
+      JOIN TABLE_RESTAURANT t ON t.id_table = c.id_table
+      JOIN UTILISATEUR u ON u.id_utilisateur = c.id_serveur
+      LEFT JOIN LIGNE_COMMANDE l ON l.id_commande = c.id_commande
       WHERE c.id_commande = ?
       GROUP BY c.id_commande
     `,
@@ -139,8 +139,8 @@ export const getCommandeById = async (id) => {
         l.*,
         p.nom AS plat_nom,
         p.image_url
-      FROM ligne_commande l
-      JOIN plat p ON p.id_plat = l.id_plat
+      FROM LIGNE_COMMANDE l
+      JOIN PLAT p ON p.id_plat = l.id_plat
       WHERE l.id_commande = ?
       ORDER BY l.id_ligne ASC
     `,
@@ -162,21 +162,21 @@ export const createCommande = async ({ id_table, id_serveur, lignes }) => {
     await connection.beginTransaction();
 
     const [commandeResult] = await connection.query(
-      'INSERT INTO commande (id_table, id_serveur, statut) VALUES (?, ?, "en_attente")',
+      'INSERT INTO COMMANDE (id_table, id_serveur, statut) VALUES (?, ?, "en_attente")',
       [id_table, id_serveur]
     );
 
     for (const ligne of lignes) {
       await connection.query(
         `
-          INSERT INTO ligne_commande (id_commande, id_plat, quantite, prix_unitaire, notes)
+          INSERT INTO LIGNE_COMMANDE (id_commande, id_plat, quantite, prix_unitaire, notes)
           VALUES (?, ?, ?, ?, ?)
         `,
         [commandeResult.insertId, ligne.id_plat, ligne.quantite, ligne.prix_unitaire, ligne.notes || null]
       );
     }
 
-    await connection.query('UPDATE table_restaurant SET statut = "occupee" WHERE id_table = ?', [id_table]);
+    await connection.query('UPDATE TABLE_RESTAURANT SET statut = "occupee" WHERE id_table = ?', [id_table]);
     await connection.commit();
 
     return getCommandeById(commandeResult.insertId);
@@ -189,12 +189,12 @@ export const createCommande = async ({ id_table, id_serveur, lignes }) => {
 };
 
 export const updateCommandeStatut = async (id, statut) => {
-  await pool.query('UPDATE commande SET statut = ? WHERE id_commande = ?', [statut, id]);
+  await pool.query('UPDATE COMMANDE SET statut = ? WHERE id_commande = ?', [statut, id]);
 
   if (statut === 'payee') {
     const commande = await getCommandeById(id);
     if (commande) {
-      await pool.query('UPDATE table_restaurant SET statut = "libre" WHERE id_table = ?', [commande.id_table]);
+      await pool.query('UPDATE TABLE_RESTAURANT SET statut = "libre" WHERE id_table = ?', [commande.id_table]);
     }
   }
 
@@ -204,7 +204,7 @@ export const updateCommandeStatut = async (id, statut) => {
 export const addLigneToCommande = async (commandeId, { id_plat, quantite, prix_unitaire, notes }) => {
   const [result] = await pool.query(
     `
-      INSERT INTO ligne_commande (id_commande, id_plat, quantite, prix_unitaire, notes)
+      INSERT INTO LIGNE_COMMANDE (id_commande, id_plat, quantite, prix_unitaire, notes)
       VALUES (?, ?, ?, ?, ?)
     `,
     [commandeId, id_plat, quantite, prix_unitaire, notes || null]
@@ -214,7 +214,7 @@ export const addLigneToCommande = async (commandeId, { id_plat, quantite, prix_u
 };
 
 export const deleteLigneFromCommande = async (commandeId, ligneId) => {
-  await pool.query('DELETE FROM ligne_commande WHERE id_commande = ? AND id_ligne = ?', [commandeId, ligneId]);
+  await pool.query('DELETE FROM LIGNE_COMMANDE WHERE id_commande = ? AND id_ligne = ?', [commandeId, ligneId]);
 };
 
 export const updateCommande = async (id, { id_table }) => {
@@ -222,7 +222,7 @@ export const updateCommande = async (id, { id_table }) => {
   try {
     await connection.beginTransaction();
 
-    const [existingRows] = await connection.query('SELECT id_commande, id_table, statut FROM commande WHERE id_commande = ? LIMIT 1', [id]);
+    const [existingRows] = await connection.query('SELECT id_commande, id_table, statut FROM COMMANDE WHERE id_commande = ? LIMIT 1', [id]);
     const existing = existingRows?.[0];
     if (!existing) {
       await connection.rollback();
@@ -231,7 +231,7 @@ export const updateCommande = async (id, { id_table }) => {
 
     if (id_table != null && Number(id_table) !== Number(existing.id_table)) {
       const [activeOther] = await connection.query(
-        'SELECT id_commande FROM commande WHERE id_table = ? AND statut <> "payee" AND id_commande <> ? LIMIT 1',
+        'SELECT id_commande FROM COMMANDE WHERE id_table = ? AND statut <> "payee" AND id_commande <> ? LIMIT 1',
         [id_table, id]
       );
       if (activeOther?.length) {
@@ -241,11 +241,11 @@ export const updateCommande = async (id, { id_table }) => {
         throw err;
       }
 
-      await connection.query('UPDATE commande SET id_table = ?, updated_at = NOW() WHERE id_commande = ?', [id_table, id]);
+      await connection.query('UPDATE COMMANDE SET id_table = ?, updated_at = NOW() WHERE id_commande = ?', [id_table, id]);
 
       if (existing.statut !== 'payee') {
-        await connection.query('UPDATE table_restaurant SET statut = "libre" WHERE id_table = ?', [existing.id_table]);
-        await connection.query('UPDATE table_restaurant SET statut = "occupee" WHERE id_table = ?', [id_table]);
+        await connection.query('UPDATE TABLE_RESTAURANT SET statut = "libre" WHERE id_table = ?', [existing.id_table]);
+        await connection.query('UPDATE TABLE_RESTAURANT SET statut = "occupee" WHERE id_table = ?', [id_table]);
       }
     }
 
@@ -265,7 +265,7 @@ export const updateCommande = async (id, { id_table }) => {
 
 export const updateCommandeLigne = async (commandeId, ligneId, { quantite, notes }) => {
   const [rows] = await pool.query(
-    'SELECT id_ligne FROM ligne_commande WHERE id_commande = ? AND id_ligne = ? LIMIT 1',
+    'SELECT id_ligne FROM LIGNE_COMMANDE WHERE id_commande = ? AND id_ligne = ? LIMIT 1',
     [commandeId, ligneId]
   );
   if (!rows?.[0]) return null;
@@ -287,7 +287,7 @@ export const updateCommandeLigne = async (commandeId, ligneId, { quantite, notes
 
   params.push(commandeId, ligneId);
   await pool.query(
-    `UPDATE ligne_commande SET ${sets.join(', ')} WHERE id_commande = ? AND id_ligne = ?`,
+    `UPDATE LIGNE_COMMANDE SET ${sets.join(', ')} WHERE id_commande = ? AND id_ligne = ?`,
     params
   );
 
@@ -300,7 +300,7 @@ export const deleteCommandeById = async (id) => {
     await connection.beginTransaction();
 
     const [rows] = await connection.query(
-      'SELECT id_commande, id_table, statut FROM commande WHERE id_commande = ? LIMIT 1',
+      'SELECT id_commande, id_table, statut FROM COMMANDE WHERE id_commande = ? LIMIT 1',
       [id]
     );
     const commande = rows?.[0];
@@ -309,15 +309,15 @@ export const deleteCommandeById = async (id) => {
       return false;
     }
 
-    await connection.query('DELETE FROM commande WHERE id_commande = ?', [id]);
+    await connection.query('DELETE FROM COMMANDE WHERE id_commande = ?', [id]);
 
     if (commande.statut !== 'payee') {
       const [stillActive] = await connection.query(
-        'SELECT id_commande FROM commande WHERE id_table = ? AND statut <> "payee" LIMIT 1',
+        'SELECT id_commande FROM COMMANDE WHERE id_table = ? AND statut <> "payee" LIMIT 1',
         [commande.id_table]
       );
       if (!stillActive?.length) {
-        await connection.query('UPDATE table_restaurant SET statut = "libre" WHERE id_table = ?', [commande.id_table]);
+        await connection.query('UPDATE TABLE_RESTAURANT SET statut = "libre" WHERE id_table = ?', [commande.id_table]);
       }
     }
 

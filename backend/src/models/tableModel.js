@@ -7,12 +7,12 @@ export const getTables = async () => {
       c.id_commande AS commande_active_id,
       c.statut AS commande_active_statut,
       c.created_at AS commande_active_created_at
-    FROM table_restaurant t
-    LEFT JOIN commande c
+    FROM TABLE_RESTAURANT t
+    LEFT JOIN COMMANDE c
       ON c.id_table = t.id_table
       AND c.id_commande = (
         SELECT c2.id_commande
-        FROM commande c2
+        FROM COMMANDE c2
         WHERE c2.id_table = t.id_table AND c2.statut <> 'payee'
         ORDER BY c2.created_at DESC
         LIMIT 1
@@ -23,12 +23,12 @@ export const getTables = async () => {
 };
 
 export const getTableById = async (id) => {
-  const [rows] = await pool.query('SELECT * FROM table_restaurant WHERE id_table = ? LIMIT 1', [id]);
+  const [rows] = await pool.query('SELECT * FROM TABLE_RESTAURANT WHERE id_table = ? LIMIT 1', [id]);
   return rows[0] || null;
 };
 
 export const updateTableStatus = async (id, statut) => {
-  await pool.query('UPDATE table_restaurant SET statut = ? WHERE id_table = ?', [statut, id]);
+  await pool.query('UPDATE TABLE_RESTAURANT SET statut = ? WHERE id_table = ?', [statut, id]);
   return getTableById(id);
 };
 
@@ -38,7 +38,7 @@ export const createTable = async ({ numero, capacite, statut }) => {
   const s = statut || 'libre';
 
   const [result] = await pool.query(
-    'INSERT INTO table_restaurant (numero, capacite, statut) VALUES (?, ?, ?)',
+    'INSERT INTO TABLE_RESTAURANT (numero, capacite, statut) VALUES (?, ?, ?)',
     [n, c, s]
   );
   return getTableById(result.insertId);
@@ -68,19 +68,19 @@ export const updateTable = async (id, { numero, capacite, statut }) => {
   }
 
   params.push(id);
-  await pool.query(`UPDATE table_restaurant SET ${fields.join(', ')} WHERE id_table = ?`, params);
+  await pool.query(`UPDATE TABLE_RESTAURANT SET ${fields.join(', ')} WHERE id_table = ?`, params);
   return getTableById(id);
 };
 
 export const getActiveCommandeForTable = async (tableId) => {
   const [rows] = await pool.query(
-    'SELECT id_commande, statut FROM commande WHERE id_table = ? AND statut <> "payee" ORDER BY created_at DESC LIMIT 1',
+    'SELECT id_commande, statut FROM COMMANDE WHERE id_table = ? AND statut <> "payee" ORDER BY created_at DESC LIMIT 1',
     [tableId]
   );
   return rows?.[0] || null;
 };
 
 export const deleteTableById = async (id) => {
-  const [result] = await pool.query('DELETE FROM table_restaurant WHERE id_table = ?', [id]);
+  const [result] = await pool.query('DELETE FROM TABLE_RESTAURANT WHERE id_table = ?', [id]);
   return result?.affectedRows ? true : false;
 };
