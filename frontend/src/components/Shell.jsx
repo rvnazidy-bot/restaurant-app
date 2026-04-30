@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.js';
 
@@ -43,8 +44,22 @@ export default function Shell({
   const navigate = useNavigate();
   const links = linksByRole[user?.role] || [];
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 900) {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleProfileClick = () => {
     navigate('/profile');
+    setSidebarOpen(false);
   };
 
   const iconByLabel = {
@@ -175,7 +190,16 @@ export default function Shell({
 
   return (
     <div className="app-shell">
-      <aside className="sidebar">
+      {sidebarOpen ? (
+        <button
+          type="button"
+          className="sidebar-backdrop"
+          aria-label="Fermer le menu"
+          onClick={() => setSidebarOpen(false)}
+        />
+      ) : null}
+
+      <aside className={`sidebar ${sidebarOpen ? 'sidebar--open' : ''}`.trim()}>
         <div className="sidebar__brand">
           <img className="sidebar__brand-logo" src="/logo.jpg" alt="RestoAcker" />
           <div className="sidebar__brand-text">
@@ -189,6 +213,7 @@ export default function Shell({
             <NavLink
               key={link.to}
               to={link.to}
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `sidebar__link ${isActive ? 'sidebar__link--active' : ''}`
               }
@@ -211,7 +236,14 @@ export default function Shell({
             </span>
             <span className="sidebar__label">Profil</span>
           </button>
-          <button type="button" className="sidebar__meta" onClick={logout}>
+          <button
+            type="button"
+            className="sidebar__meta"
+            onClick={() => {
+              setSidebarOpen(false);
+              logout();
+            }}
+          >
             <span className="sidebar__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="18" height="18">
                 <path
@@ -226,6 +258,19 @@ export default function Shell({
       </aside>
 
       <main className="page-shell">
+        <div className="sidebar-mobilebar">
+          <button
+            type="button"
+            className="sidebar-toggle"
+            aria-label="Ouvrir le menu"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path fill="currentColor" d="M4 6h16v2H4V6Zm0 5h16v2H4v-2Zm0 5h16v2H4v-2Z" />
+            </svg>
+          </button>
+        </div>
+
         {!hideHeader ? (
           <header className="page-header">
             <div>

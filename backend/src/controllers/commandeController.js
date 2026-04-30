@@ -89,6 +89,8 @@ export const postCommande = async (req, res) => {
 
       normalizedLines.push({
         id_plat: plat.id_plat,
+        plat_nom: plat.nom,
+        plat_image_url: plat.image_url || null,
         quantite: Number(ligne.quantite || 1),
         prix_unitaire: Number(plat.prix),
         notes: ligne.notes || null
@@ -130,6 +132,8 @@ export const postCommandeLigne = async (req, res) => {
 
     await addLigneToCommande(req.params.id, {
       id_plat: plat.id_plat,
+      plat_nom: plat.nom,
+      plat_image_url: plat.image_url || null,
       quantite: Number(req.body.quantite || 1),
       prix_unitaire: Number(plat.prix),
       notes: req.body.notes || null

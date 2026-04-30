@@ -22,12 +22,12 @@ export const getDashboardStats = async () => {
 
   const [topRows] = await pool.query(`
     SELECT
-      p.id_plat,
-      p.nom,
+      l.id_plat,
+      COALESCE(p.nom, l.plat_nom) AS nom,
       SUM(l.quantite) AS quantite_totale
     FROM LIGNE_COMMANDE l
-    JOIN PLAT p ON p.id_plat = l.id_plat
-    GROUP BY p.id_plat, p.nom
+    LEFT JOIN PLAT p ON p.id_plat = l.id_plat
+    GROUP BY l.id_plat, COALESCE(p.nom, l.plat_nom)
     ORDER BY quantite_totale DESC
     LIMIT 5
   `);

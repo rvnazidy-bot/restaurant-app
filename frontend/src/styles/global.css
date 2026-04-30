@@ -335,12 +335,19 @@ a {
 }
 
 .app-shell {
-  display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
+  display: block;
   min-height: 100vh;
 }
 
 .sidebar {
+  width: 280px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  z-index: 40;
   background: #ffffff;
   border-right: 1px solid rgba(0, 0, 0, 0.10);
   padding: 28px 18px;
@@ -444,8 +451,32 @@ a {
 
 .page-shell {
   padding: 26px 30px;
+  margin-left: 280px;
   max-width: 100%;
   overflow-x: hidden;
+}
+
+.sidebar-backdrop {
+  display: none;
+}
+
+.sidebar-mobilebar {
+  display: none;
+}
+
+.sidebar-toggle {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #ffffff;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: rgba(0, 0, 0, 0.72);
+}
+
+.sidebar-toggle:hover {
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .page-header {
@@ -3927,9 +3958,39 @@ a {
     grid-template-columns: 1fr;
   }
 
+  .page-shell {
+    margin-left: 0;
+  }
+
   .sidebar {
-    border-right: 0;
-    border-bottom: 1px solid rgba(234, 223, 215, 0.85);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    border-right: 1px solid rgba(0, 0, 0, 0.10);
+    border-bottom: 0;
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+  }
+
+  .sidebar--open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    border: 0;
+    padding: 0;
+    z-index: 35;
+  }
+
+  .sidebar-mobilebar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
   }
 
   .split-layout {

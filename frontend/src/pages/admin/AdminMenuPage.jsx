@@ -136,6 +136,11 @@ export default function AdminMenuPage() {
       setConfirmDelete(null);
       loadData();
     } catch (err) {
+      const status = err?.response?.status;
+      if (status === 409) {
+        pushToast({ tone: 'warning', title: 'Suppression impossible', message: extractApiError(err) });
+        return;
+      }
       pushToast({ tone: 'error', title: 'Suppression impossible', message: extractApiError(err) });
     }
   };

@@ -49,5 +49,10 @@ export const updatePlatDisponibilite = async (id, disponible) => {
 };
 
 export const deletePlat = async (id) => {
-  await pool.query('DELETE FROM PLAT WHERE id_plat = ?', [id]);
+  const [result] = await pool.query('DELETE FROM PLAT WHERE id_plat = ?', [id]);
+  if (!result.affectedRows) {
+    const err = new Error('Plat not found.');
+    err.code = 'NOT_FOUND';
+    throw err;
+  }
 };

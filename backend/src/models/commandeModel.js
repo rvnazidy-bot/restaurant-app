@@ -77,10 +77,10 @@ export const listCommandes = async ({ role, statut, date, table, scope }) => {
           l.quantite,
           l.prix_unitaire,
           l.notes,
-          p.nom AS plat_nom,
-          p.image_url
+          COALESCE(p.nom, l.plat_nom) AS plat_nom,
+          COALESCE(p.image_url, l.plat_image_url) AS plat_image_url
         FROM LIGNE_COMMANDE l
-        JOIN PLAT p ON p.id_plat = l.id_plat
+        LEFT JOIN PLAT p ON p.id_plat = l.id_plat
         WHERE l.id_commande IN (${placeholders})
         ORDER BY l.id_commande ASC, l.id_ligne ASC
       `,
@@ -137,10 +137,10 @@ export const getCommandeById = async (id) => {
     `
       SELECT
         l.*,
-        p.nom AS plat_nom,
-        p.image_url
+        COALESCE(p.nom, l.plat_nom) AS plat_nom,
+        COALESCE(p.image_url, l.plat_image_url) AS plat_image_url
       FROM LIGNE_COMMANDE l
-      JOIN PLAT p ON p.id_plat = l.id_plat
+      LEFT JOIN PLAT p ON p.id_plat = l.id_plat
       WHERE l.id_commande = ?
       ORDER BY l.id_ligne ASC
     `,
@@ -169,10 +169,18 @@ export const createCommande = async ({ id_table, id_serveur, lignes }) => {
     for (const ligne of lignes) {
       await connection.query(
         `
-          INSERT INTO LIGNE_COMMANDE (id_commande, id_plat, quantite, prix_unitaire, notes)
-          VALUES (?, ?, ?, ?, ?)
+          INSERT INTO LIGNE_COMMANDE (id_commande, id_plat, plat_nom, plat_image_url, quantite, prix_unitaire, notes)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
         `,
-        [commandeResult.insertId, ligne.id_plat, ligne.quantite, ligne.prix_unitaire, ligne.notes || null]
+        [
+          commandeResult.insertId,
+          ligne.id_plat,
+          ligne.plat_nom,
+          ligne.plat_image_url || null,
+          ligne.quantite,
+          ligne.prix_unitaire,
+          ligne.notes || null
+        ]
       );
     }
 
@@ -201,13 +209,13 @@ export const updateCommandeStatut = async (id, statut) => {
   return getCommandeById(id);
 };
 
-export const addLigneToCommande = async (commandeId, { id_plat, quantite, prix_unitaire, notes }) => {
+export const addLigneToCommande = async (commandeId, { id_plat, plat_nom, plat_image_url, quantite, prix_unitaire, notes }) => {
   const [result] = await pool.query(
     `
-      INSERT INTO LIGNE_COMMANDE (id_commande, id_plat, quantite, prix_unitaire, notes)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO LIGNE_COMMANDE (id_commande, id_plat, plat_nom, plat_image_url, quantite, prix_unitaire, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `,
-    [commandeId, id_plat, quantite, prix_unitaire, notes || null]
+    [commandeId, id_plat, plat_nom, plat_image_url || null, quantite, prix_unitaire, notes || null]
   );
 
   return result.insertId;

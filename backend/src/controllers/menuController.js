@@ -76,6 +76,22 @@ export const removePlat = async (req, res) => {
     await deletePlat(req.params.id);
     return res.json({ message: 'Plat supprime.' });
   } catch (error) {
+    if (error?.code === 'NOT_FOUND') {
+      return res.status(404).json({ message: 'Plat introuvable.' });
+    }
+
+    if (error?.code === 'ER_ROW_IS_REFERENCED_2' || error?.code === 'ER_UPDATE_ROW_IS_REFERENCED_2') {
+      return res
+        .status(409)
+        .json({ message: 'Impossible de supprimer ce plat car il est reference par des commandes (migration base requise pour la suppression avec historique).' });
+    }
+
+    if (error?.code === 'ER_BAD_NULL_ERROR') {
+      return res
+        .status(409)
+        .json({ message: 'Suppression bloquee par la base (id_plat non nullable). Appliquez la migration pour activer la suppression avec historique.' });
+    }
+
     return res.status(500).json({ message: 'Impossible de supprimer ce plat.' });
   }
 };
