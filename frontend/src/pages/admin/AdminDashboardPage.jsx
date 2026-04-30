@@ -335,22 +335,23 @@ export default function AdminDashboardPage() {
           <Modal
             open={Boolean(selectedId)}
             title={selectedCommande ? `Detail commande #${selectedCommande.id_commande}` : 'Detail commande'}
-            size="lg"
+            variant="sheet"
             onClose={() => {
               setSelectedId(null);
               setSelectedCommande(null);
               setDetailError('');
               setDetailLoading(false);
             }}
+            className="menu-modal--sheet"
             footer={
               selectedCommande ? (
                 <>
-                  <Button variant="ghost" onClick={() => setSelectedId(null)}>
-                    Fermer
+                  <Button className="menu-sheet__btn menu-sheet__btn--cancel" variant="secondary" onClick={() => setSelectedId(null)}>
+                    FERMER
                   </Button>
                   {selectedCommande.statut !== 'payee' ? (
-                    <Button variant="secondary" onClick={() => markAsPaid(selectedCommande)}>
-                      Marquer payee
+                    <Button className="menu-sheet__btn" onClick={() => markAsPaid(selectedCommande)}>
+                      MARQUER PAYEE
                     </Button>
                   ) : null}
                 </>

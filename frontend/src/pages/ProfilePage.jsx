@@ -7,20 +7,33 @@ export default function ProfilePage() {
   const { user, logout } = useAuth();
 
   return (
-    <Shell title="Profil" subtitle="Informations du compte" hideHeader>
-      <div className="profile-page">
-        <Card className="profile-card">
-          <div className="stack">
-            <div className="key-value">
-              <div className="key-value__row"><span>Nom</span><strong>{user?.nom || '-'}</strong></div>
-              <div className="key-value__row"><span>Email</span><strong>{user?.email || '-'}</strong></div>
-              <div className="key-value__row"><span>Rôle</span><strong>{user?.role || '-'}</strong></div>
+    <Shell
+      title="Profil"
+      subtitle="Informations du compte"
+      actions={(
+        <Button variant="secondary" onClick={logout}>
+          Déconnexion
+        </Button>
+      )}
+    >
+      <Card>
+        <div className="stack">
+          <div className="key-value">
+            <div className="key-value__row">
+              <span>Nom</span>
+              <strong>{user?.nom || '-'}</strong>
             </div>
-            <div className="divider" />
-            <Button variant="secondary" onClick={logout}>Déconnexion</Button>
+            <div className="key-value__row">
+              <span>Email</span>
+              <strong>{user?.email || '-'}</strong>
+            </div>
+            <div className="key-value__row">
+              <span>Rôle</span>
+              <strong>{user?.role || '-'}</strong>
+            </div>
           </div>
-        </Card>
-      </div>
+        </div>
+      </Card>
     </Shell>
   );
 }

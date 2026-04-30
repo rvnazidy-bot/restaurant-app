@@ -296,15 +296,15 @@ export default function AdminPersonnelPage() {
         open={inviteModal}
         title="Inviter un employe"
         onClose={() => setInviteModal(false)}
-        className="personnel-modal--invite"
-        closeIcon
+        variant="sheet"
+        className="menu-modal--sheet"
         footer={
           <>
-            <Button className="personnel-invite__primary" variant="secondary" onClick={handleInvite}>
-              ENVOYER L'INVITATION
-            </Button>
-            <Button className="personnel-invite__secondary" variant="ghost" onClick={() => setInviteModal(false)}>
+            <Button className="menu-sheet__btn menu-sheet__btn--cancel" variant="secondary" onClick={() => setInviteModal(false)}>
               ANNULER
+            </Button>
+            <Button className="menu-sheet__btn" onClick={handleInvite}>
+              ENVOYER L'INVITATION
             </Button>
           </>
         }
@@ -353,10 +353,23 @@ export default function AdminPersonnelPage() {
 
       <Modal
         open={disableModal.open}
-        title=""
+        title="CONFIRMATION"
         onClose={() => setDisableModal({ open: false, user: null })}
-        className="personnel-modal--disable"
-        footer={null}
+        className="menu-modal--confirm"
+        footer={
+          <>
+            <Button
+              className="menu-confirm__btn menu-confirm__btn--cancel"
+              variant="secondary"
+              onClick={() => setDisableModal({ open: false, user: null })}
+            >
+              ANNULER
+            </Button>
+            <Button className="menu-confirm__btn" onClick={confirmDisable}>
+              CONFIRMER
+            </Button>
+          </>
+        }
       >
         <div className="personnel-disable">
           <div className="personnel-disable__icon" aria-hidden="true">
@@ -372,12 +385,6 @@ export default function AdminPersonnelPage() {
             Etes-vous sur de vouloir desactiver le compte de <strong>{disableModal.user?.nom}</strong> ? Elle ne pourra plus se
             connecter au systeme jusqu'a reactivation.
           </p>
-          <Button className="personnel-disable__cta" onClick={confirmDisable}>
-            CONFIRMER LA DESACTIVATION
-          </Button>
-          <button type="button" className="personnel-disable__back" onClick={() => setDisableModal({ open: false, user: null })}>
-            RETOUR
-          </button>
         </div>
       </Modal>
 
@@ -385,21 +392,20 @@ export default function AdminPersonnelPage() {
         open={editModal.open}
         title="Modifier l'employe"
         onClose={closeEditModal}
-        className="personnel-modal--invite"
-        closeIcon
+        variant="sheet"
+        className="menu-modal--sheet"
         footer={
           <>
             <Button
-              className="personnel-invite__primary"
-              variant="secondary"
+              className="menu-sheet__btn"
               onClick={saveUserEdits}
               disabled={editModal.saving}
             >
               ENREGISTRER
             </Button>
             <Button
-              className="personnel-invite__secondary"
-              variant="ghost"
+              className="menu-sheet__btn menu-sheet__btn--cancel"
+              variant="secondary"
               onClick={closeEditModal}
               disabled={editModal.saving}
             >

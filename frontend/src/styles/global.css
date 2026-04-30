@@ -959,39 +959,6 @@ a {
   color: #c0392b !important;
 }
 
-.personnel-modal--invite {
-  width: min(440px, calc(100vw - 40px)) !important;
-  border-radius: 4px !important;
-}
-
-.personnel-modal--invite .modal__header {
-  padding: 18px 20px;
-  align-items: center;
-}
-
-.personnel-modal--invite .modal__body {
-  padding: 0 20px 18px;
-}
-
-.personnel-modal--invite .modal__footer {
-  padding: 18px 20px;
-  justify-content: flex-start;
-  gap: 12px;
-  flex-wrap: wrap;
-  overflow: hidden;
-}
-
-.personnel-modal--invite .modal__footer .personnel-invite__primary {
-  flex: 1 1 240px;
-  width: auto;
-  max-width: 100%;
-}
-
-.personnel-modal--invite .modal__footer .personnel-invite__secondary {
-  flex: 0 0 128px;
-  max-width: 100%;
-}
-
 .personnel-invite__info {
   display: grid;
   grid-template-columns: 18px 1fr;
@@ -1026,80 +993,10 @@ a {
   color: rgba(0, 0, 0, 0.65) !important;
 }
 
-.personnel-modal--invite .field__input,
-.personnel-modal--invite .select {
-  border-radius: 4px !important;
-  min-height: 42px;
-}
-
-.personnel-modal--invite .modal__close {
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  display: grid;
-  place-items: center;
-  border-radius: 4px;
-}
-
-.personnel-modal--invite .modal__close:hover {
-  background: rgba(0, 0, 0, 0.04);
-}
-
-.personnel-modal--disable {
-  width: min(460px, calc(100vw - 40px)) !important;
-  border-radius: 4px !important;
-}
-
-.personnel-modal--disable .modal__header {
-  display: none;
-}
-
-.personnel-modal--disable .modal__body {
-  padding: 36px 34px 28px;
-}
-
 @media (max-width: 520px) {
-  .personnel-modal--invite {
-    width: min(420px, calc(100vw - 24px)) !important;
-  }
-
-  .personnel-modal--disable {
-    width: min(420px, calc(100vw - 24px)) !important;
-  }
-
-  .personnel-modal--invite .modal__header {
-    padding: 16px 16px;
-  }
-
-  .personnel-modal--invite .modal__body {
-    padding: 0 16px 16px;
-  }
-
-  .personnel-modal--invite .modal__footer {
-    padding: 16px 16px;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .personnel-modal--invite .modal__footer .personnel-invite__primary,
-  .personnel-modal--invite .modal__footer .personnel-invite__secondary {
-    width: 100% !important;
-    min-width: 0;
-  }
-
   .personnel-invite__info {
     grid-template-columns: 16px 1fr;
     gap: 8px;
-  }
-
-  .personnel-modal--invite .modal__close {
-    width: 30px;
-    height: 30px;
-  }
-
-  .personnel-modal--disable .modal__body {
-    padding: 28px 20px 22px;
   }
 
   .personnel-disable__text {
@@ -2178,13 +2075,16 @@ a {
 }
 
 .menu-modal--mini .modal__header {
-  justify-content: center;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.10);
+  justify-content: flex-start;
 }
 
 .menu-modal--mini .modal__header h3 {
   font-weight: 900;
   letter-spacing: 0.08em;
   font-size: 12px;
+  text-transform: uppercase;
 }
 
 .topbar-shell {

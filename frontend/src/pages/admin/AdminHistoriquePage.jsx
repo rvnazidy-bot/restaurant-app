@@ -389,9 +389,16 @@ export default function AdminHistoriquePage() {
       <Modal
         open={Boolean(selected)}
         title={selected ? `Detail commande #${selected.id_commande}` : 'Detail commande'}
-        size="lg"
+        variant="sheet"
         onClose={() => setSelected(null)}
-        footer={<Button onClick={() => setSelected(null)}>Fermer</Button>}
+        className="menu-modal--sheet"
+        footer={
+          <>
+            <Button className="menu-sheet__btn menu-sheet__btn--cancel" variant="secondary" onClick={() => setSelected(null)}>
+              FERMER
+            </Button>
+          </>
+        }
       >
         {selected ? (
           <div className="stack">
