@@ -20,6 +20,11 @@ COPY backend/package*.json ./backend/
 RUN cd backend && npm ci --omit=dev
 
 COPY backend ./backend
+
+# --- Migration Option C (snapshot) ---
+# La migration est idempotente ; si déjà appliquée, elle ne fait rien.
+RUN cd backend && npm run migrate:snapshot-c
+
 COPY --from=frontend-build /app/frontend/dist /app/frontend/dist
 
 EXPOSE 5000
